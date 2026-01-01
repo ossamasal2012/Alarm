@@ -1,19 +1,19 @@
 {
-  "name": "OSSAMA TV",
-  "short_name": "OSSAMA TV",
+  "name": "Alarm - المنبه",
+  "short_name": "Alarm - المنبه",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#020202",
   "theme_color": "#020202",
   "icons": [
     {
-      "src": "https://i.ibb.co/fYkRx1fB/Gemini-Generated-Image-ekxxfoekxxfoekxx.png",
+      "src": "https://i.ibb.co/S4MCGyyH/Untitled-2.png",
       "sizes": "any",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://i.ibb.co/fYkRx1fB/Gemini-Generated-Image-ekxxfoekxxfoekxx.png",
+      "src": "https://i.ibb.co/S4MCGyyH/Untitled-2.png",
       "sizes": "any",
       "type": "image/png",
       "purpose": "maskable"
