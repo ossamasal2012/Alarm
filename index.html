@@ -28,482 +28,532 @@
 
     <meta property="og:image" content="https://i.ibb.co/fYkRx1fB/Gemini-Generated-Image-ekxxfoekxxfoekxx.png">
     <meta itemprop="image" content="https://i.ibb.co/fYkRx1fB/Gemini-Generated-Image-ekxxfoekxxfoekxx.png">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al-Wake Desktop - المنبه الاحترافي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
+
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --bg: #0b0f1a;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+        }
+
         body {
             font-family: 'Tajawal', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
+            background: radial-gradient(circle at top right, #1e1b4b, #0b0f1a 60%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
         }
 
-        .dark-mode {
-            background-color: #0f172a;
-            color: #f8fafc;
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .light-mode {
-            background-color: #f1f5f9;
-            color: #1e293b;
+        .glass-panel:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-5px);
         }
 
-        .glass-card {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1.5rem;
-        }
-
-        .light-mode .glass-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-        }
-
-        .alarm-item {
-            transition: transform 0.2s ease;
-        }
-        
-        .alarm-item:hover {
-            transform: scale(1.02);
-        }
-
-        .clock-shadow {
-            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-        }
-
-        /* Toggle Switch Styling */
         .switch {
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 26px;
+            width: 54px;
+            height: 28px;
         }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
+        .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #334155;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1);
             transition: .4s;
             border-radius: 34px;
         }
-
-        .light-mode .slider {
-            background-color: #cbd5e1;
-        }
-
         .slider:before {
             position: absolute;
             content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
+            height: 20px; width: 20px;
+            left: 4px; bottom: 4px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input:checked + .slider { background: linear-gradient(45deg, var(--primary), var(--secondary)); }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        #alarm-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            padding: 20px 0;
         }
 
-        input:checked + .slider {
-            background-color: #3b82f6;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(24px);
-        }
-
-        .progress-container {
-            width: 100%;
-            height: 6px;
-            background: rgba(255,255,255,0.1);
+        .day-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 10px;
-            overflow: hidden;
-            margin-top: 10px;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
         }
-
-        #progress-bar {
-            height: 100%;
-            background: #3b82f6;
-            width: 100%;
-            transition: width 1s linear;
-        }
-
-        input[type="file"]::file-selector-button {
-            background-color: #3b82f6;
+        .day-btn.active {
+            background: var(--primary);
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            border: none;
-            cursor: pointer;
-            margin-left: 1rem;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .pulse-ring {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 0.4; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
         }
     </style>
 </head>
-<body class="dark-mode min-h-screen p-4 md:p-8">
+<body class="p-6 lg:p-12">
 
-    <div class="max-w-md mx-auto space-y-6">
-        <!-- Header and Current Time -->
-        <header class="text-center py-6">
-            <h1 id="current-time" class="text-5xl font-bold clock-shadow mb-2">00:00:00</h1>
-            <p id="current-date" class="text-gray-500 font-medium">--</p>
+    <div class="max-w-7xl mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-end md:items-center mb-12 gap-6">
+            <div class="space-y-2">
+                <h1 class="text-5xl font-extrabold tracking-tight">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
+                        Al-Wake
+                    </span>
+                    <span class="text-sm font-light text-indigo-300/50 block mt-1 tracking-widest uppercase text-right">نظام الاستيقاظ الاحترافي</span>
+                </h1>
+                <p id="current-date" class="text-gray-400 text-lg"></p>
+            </div>
+            
+            <div class="glass-panel px-8 py-4 flex flex-col items-center">
+                <div id="current-time" class="text-5xl font-bold tracking-tighter text-white tabular-nums">00:00:00</div>
+                <div class="text-xs text-indigo-400/70 font-bold mt-1 uppercase">توقيت الكمبيوتر</div>
+            </div>
         </header>
 
-        <!-- Action Controls -->
-        <div class="flex justify-between items-center px-2">
-            <button id="theme-toggle" class="glass-card p-3 rounded-full hover:bg-blue-500 hover:text-white transition">
-                <i class="fas fa-sun"></i>
-            </button>
-            <button onclick="toggleModal('alarm-modal')" class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:bg-blue-700 transition">
-                <i class="fas fa-plus ml-2"></i> إضافة منبه
-            </button>
-            <button onclick="toggleModal('settings-modal')" class="glass-card p-3 rounded-full hover:bg-gray-500 hover:text-white transition">
-                <i class="fas fa-cog"></i>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="glass-panel p-6 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+                    <i class="fas fa-clock text-xl"></i>
+                </div>
+                <div>
+                    <div id="active-count" class="text-2xl font-bold">0</div>
+                    <div class="text-xs text-gray-500 uppercase">منبهات قيد العمل</div>
+                </div>
+            </div>
+            <div class="glass-panel p-6 flex items-center gap-4 border-l-4 border-l-indigo-500">
+                <div class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400">
+                    <i class="fas fa-bolt text-xl"></i>
+                </div>
+                <div>
+                    <div id="next-alarm-countdown" class="text-xl font-bold text-indigo-400">لا يوجد منبه قادم</div>
+                    <div id="next-alarm-time" class="text-[10px] text-gray-500 uppercase">الموعد الحقيقي التالي</div>
+                </div>
+            </div>
+            <button onclick="openModal()" class="group glass-panel p-6 flex items-center justify-center gap-4 bg-gradient-to-br from-indigo-600/20 to-purple-600/20 hover:from-indigo-600/40 hover:to-purple-600/40 border-indigo-500/30">
+                <i class="fas fa-plus-circle text-2xl text-indigo-400 group-hover:scale-125 transition-transform"></i>
+                <span class="font-bold text-lg">إضافة منبه ذكي</span>
             </button>
         </div>
 
-        <!-- Alarms List -->
-        <div id="alarms-list" class="space-y-4">
-            <!-- Dynamic alarms injected here -->
-        </div>
-
-        <!-- Empty State -->
-        <div id="empty-state" class="text-center py-20 opacity-50">
-            <i class="fas fa-bell-slash text-6xl mb-4"></i>
-            <p>لا توجد منبهات حالياً</p>
-        </div>
+        <div id="alarm-list"></div>
     </div>
 
-    <!-- Alarm Add/Edit Modal -->
-    <div id="alarm-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden flex items-center justify-center p-4 z-50">
-        <div class="glass-card bg-slate-800 text-white w-full max-w-sm p-6 space-y-4 overflow-y-auto max-h-[90vh]">
-            <h2 id="modal-title" class="text-xl font-bold border-b border-slate-700 pb-2">إضافة منبه جديد</h2>
-            
-            <input type="hidden" id="edit-id">
-
-            <div class="space-y-2">
-                <label class="block text-sm">اسم المنبه</label>
-                <input type="text" id="alarm-label" placeholder="مثال: الاستيقاظ للعمل" class="w-full p-3 rounded-xl border border-slate-600 bg-slate-900 text-white outline-none focus:border-blue-500 text-right">
-            </div>
-
-            <div class="space-y-2">
-                <label class="block text-sm">الوقت</label>
-                <input type="time" id="alarm-time" class="w-full p-3 rounded-xl border border-slate-600 bg-slate-900 text-white text-2xl font-bold text-center outline-none focus:border-blue-500">
-            </div>
-
-            <div class="space-y-2">
-                <label class="block text-sm">تكرار الأيام</label>
-                <div class="flex justify-between gap-1" id="days-container">
-                    <button type="button" data-day="0" class="day-btn w-8 h-8 rounded-full border border-slate-600 text-xs flex items-center justify-center transition">ح</button>
-                    <button type="button" data-day="1" class="day-btn w-8 h-8 rounded-full border border-slate-600 text-xs flex items-center justify-center transition">ن</button>
-                    <button type="button" data-day="2" class="day-btn w-8 h-8 rounded-full border border-slate-600 text-xs flex items-center justify-center transition">ث</button>
-                    <button type="button" data-day="3" class="day-btn w-8 h-8 rounded-full border border-slate-600 text-xs flex items-center justify-center transition">ر</button>
-                    <button type="button" data-day="4" class="day-btn w-8 h-8 rounded-full border border-slate-600 text-xs flex items-center justify-center transition">خ</button>
-                    <button type="button" data-day="5" class="day-btn w-8 h-8 rounded-full border border-slate-600 text-xs flex items-center justify-center transition">ج</button>
-                    <button type="button" data-day="6" class="day-btn w-8 h-8 rounded-full border border-slate-600 text-xs flex items-center justify-center transition">س</button>
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <label class="block text-sm">نغمة التنبيه (اختياري)</label>
-                <input type="file" id="alarm-sound" accept="audio/*" class="text-xs w-full">
-            </div>
-
-            <div class="space-y-2">
-                <label class="block text-sm">الإغلاق التلقائي</label>
-                <select id="auto-off" class="w-full p-3 rounded-xl border border-slate-600 bg-slate-900 text-white outline-none">
-                    <option value="30">30 ثانية</option>
-                    <option value="60">دقيقة واحدة</option>
-                    <option value="300">5 دقائق</option>
-                    <option value="600">10 دقائق</option>
-                    <option value="0">عدم الإغلاق تلقائياً</option>
-                </select>
-            </div>
-
-            <div class="flex gap-2 pt-4">
-                <button type="button" onclick="saveAlarm()" class="flex-1 bg-blue-600 text-white p-3 rounded-xl font-bold hover:bg-blue-700 transition">حفظ</button>
-                <button type="button" onclick="toggleModal('alarm-modal')" class="flex-1 bg-slate-700 text-white p-3 rounded-xl hover:bg-slate-600 transition">إلغاء</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden flex items-center justify-center p-4 z-50">
-        <div class="glass-card bg-slate-800 text-white w-full max-w-sm p-6 space-y-6">
-            <h2 class="text-xl font-bold border-b border-slate-700 pb-2 text-center">الإعدادات والتواصل</h2>
-            
-            <div class="space-y-4">
-                <div class="flex items-center gap-4">
-                    <div class="bg-blue-900 p-3 rounded-full text-blue-400">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-400">البريد الإلكتروني</p>
-                        <a href="mailto:ossamasal2012@gmail.com" class="font-medium hover:text-blue-400">ossamasal2012@gmail.com</a>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-4">
-                    <div class="bg-pink-900 p-3 rounded-full text-pink-400">
-                        <i class="fab fa-tiktok"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-400">حساب تيك توك</p>
-                        <a href="https://www.tiktok.com/@ossama_salam" target="_blank" class="font-medium hover:text-pink-400">@ossama_salam</a>
-                    </div>
-                </div>
-
-                <div class="pt-4 space-y-2 border-t border-slate-700 text-center">
-                    <h3 class="font-bold text-sm text-blue-400">تطبيق المنبه الذكي v2.1</h3>
-                    <p class="text-xs text-gray-400">بواسطة: أسامة سلام</p>
-                </div>
-            </div>
-
-            <button onclick="toggleModal('settings-modal')" class="w-full bg-slate-700 p-3 rounded-xl hover:bg-slate-600 transition">إغلاق</button>
-        </div>
-    </div>
-
-    <!-- Ringing UI (خلفية ثابتة تماماً) -->
-    <div id="ringing-ui" class="fixed inset-0 bg-slate-950 text-white hidden flex items-center justify-center z-[100] p-6">
-        <div class="relative z-10 w-full max-w-xs flex flex-col items-center text-center space-y-8">
-            <div class="space-y-2">
-                <div class="text-blue-500 mb-4">
-                    <i class="fas fa-bell text-6xl"></i>
-                </div>
-                <h2 id="ringing-label" class="text-2xl font-bold opacity-80">اسم المنبه</h2>
-                
-                <!-- Time Remaining Section -->
-                <div id="auto-off-container" class="mt-4 px-4 py-2 bg-slate-900 rounded-lg border border-slate-800">
-                    <p class="text-xs text-gray-400 mb-1">سيغلق تلقائياً خلال:</p>
-                    <p id="time-remaining" class="text-xl font-bold text-blue-300">--</p>
-                    <div class="progress-container">
-                        <div id="progress-bar"></div>
-                    </div>
-                </div>
-            </div>
-
-            <h3 id="ringing-time" class="text-7xl font-black tracking-tighter clock-shadow">00:00</h3>
-            
-            <div class="flex flex-col gap-4 w-full">
-                <button onclick="stopAlarm()" class="w-full bg-blue-600 text-white py-5 rounded-2xl text-2xl font-bold shadow-2xl active:scale-95 transition-all">
-                    <i class="fas fa-stop ml-2"></i> إيقاف
-                </button>
-                <button onclick="snoozeAlarm()" class="w-full bg-slate-800 text-white py-4 rounded-2xl border-2 border-slate-700 font-bold active:scale-95 transition-all">
-                    <i class="fas fa-clock ml-2"></i> غفوة (5 دقائق)
+    <div id="alarm-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-6 modal-backdrop">
+        <div class="glass-panel w-full max-w-lg p-8 shadow-2xl bg-[#121624] overflow-y-auto max-h-[90vh]">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-bold" id="modal-title">تخصيص المنبه</h2>
+                <button onclick="closeModal()" class="w-10 h-10 rounded-full hover:bg-white/5 flex items-center justify-center transition-colors">
+                    <i class="fas fa-times text-gray-400"></i>
                 </button>
             </div>
+
+            <div class="grid grid-cols-1 gap-8">
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-indigo-300">اسم المنبه</label>
+                    <input type="text" id="alarm-name" placeholder="مثلاً: صلاة الفجر" class="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:border-indigo-500 outline-none transition-all">
+                </div>
+
+                <div class="flex flex-col items-center justify-center p-6 bg-white/5 rounded-3xl border border-white/5">
+                    <input type="time" id="alarm-time" class="bg-transparent text-7xl font-bold text-white focus:outline-none cursor-pointer hover:text-indigo-400 transition-colors">
+                </div>
+
+                <div class="grid grid-cols-1 gap-6">
+                    <div class="space-y-4">
+                        <p class="text-sm font-bold text-indigo-300">أيام التكرار</p>
+                        <div class="flex flex-wrap gap-2" id="days-container">
+                            <button onclick="toggleDay(this, 0)" class="day-btn" data-day="0">أحد</button>
+                            <button onclick="toggleDay(this, 1)" class="day-btn" data-day="1">اثنين</button>
+                            <button onclick="toggleDay(this, 2)" class="day-btn" data-day="2">ثلاثاء</button>
+                            <button onclick="toggleDay(this, 3)" class="day-btn" data-day="3">أربعاء</button>
+                            <button onclick="toggleDay(this, 4)" class="day-btn" data-day="4">خميس</button>
+                            <button onclick="toggleDay(this, 5)" class="day-btn" data-day="5">جمعة</button>
+                            <button onclick="toggleDay(this, 6)" class="day-btn" data-day="6">سبت</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <p class="text-sm font-bold text-indigo-300">نغمة التنبيه</p>
+                        <div class="flex items-center gap-4">
+                            <button onclick="document.getElementById('audio-input').click()" class="flex-1 flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 hover:border-indigo-500/50 transition-all">
+                                <span id="file-name-display" class="text-sm text-gray-400">استخدام نغمة من الجهاز...</span>
+                                <i class="fas fa-music text-indigo-400"></i>
+                            </button>
+                            <input type="file" id="audio-input" accept="audio/*" class="hidden" onchange="handleFileSelect(event)">
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-purple-500/5 rounded-3xl border border-purple-500/10">
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-redo text-purple-400"></i>
+                                <span class="font-bold">وقت الغفوة (بالدقائق)</span>
+                            </div>
+                        </div>
+                        <input type="number" id="snooze-min" value="5" min="1" max="60" class="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-center focus:border-purple-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="p-6 bg-indigo-500/5 rounded-3xl border border-indigo-500/10">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-stopwatch text-indigo-400"></i>
+                            <span class="font-bold">نظام الإغلاق التلقائي</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="auto-close-toggle" onchange="toggleAutoCloseInputs()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div id="auto-close-inputs" class="flex gap-4 opacity-50 pointer-events-none transition-opacity">
+                        <div class="flex-1 space-y-2">
+                            <span class="text-[10px] uppercase text-gray-500 tracking-widest">الدقائق</span>
+                            <input type="number" id="close-min" value="0" min="0" max="59" class="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-center focus:border-indigo-500 outline-none">
+                        </div>
+                        <div class="flex-1 space-y-2">
+                            <span class="text-[10px] uppercase text-gray-500 tracking-widest">الثواني</span>
+                            <input type="number" id="close-sec" value="30" min="0" max="59" class="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-center focus:border-indigo-500 outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button onclick="saveAlarm()" class="flex-[2] bg-gradient-to-r from-indigo-600 to-purple-600 py-4 rounded-2xl font-bold hover:opacity-90 active:scale-95 transition-all shadow-xl shadow-indigo-500/20">حفظ المنبه</button>
+                    <button onclick="closeModal()" class="flex-1 bg-white/5 py-4 rounded-2xl hover:bg-white/10 transition-all font-medium text-gray-400">إلغاء</button>
+                </div>
+            </div>
         </div>
     </div>
+
+<div id="ringing-screen" class="fixed inset-0 bg-[#0b0f1a] z-[100] hidden flex flex-col items-center justify-center text-center">
+    <div class="absolute inset-0 bg-gradient-to-b from-indigo-600/20 to-transparent"></div>
+    
+    <div class="relative z-10 p-6 w-full max-w-2xl flex flex-col items-center">
+        <div class="w-48 h-48 rounded-full bg-indigo-500/10 flex items-center justify-center mb-10 pulse-ring border border-indigo-500/20">
+            <i class="fas fa-bell text-7xl text-indigo-400 animate-bounce"></i>
+        </div>
+        
+        <h3 id="ringing-label" class="text-3xl text-indigo-300 font-medium mb-2 tracking-widest uppercase">اسم المنبه هنا</h3>
+        
+        <h2 class="text-6xl font-black mb-4 tracking-tighter text-white">وقت الاستيقاظ!</h2>
+        
+        <div id="ringing-time-display" class="text-5xl text-white/80 font-mono mb-10 bg-white/5 px-8 py-2 rounded-2xl border border-white/10">
+            00:00:00
+        </div>
+        
+        <div id="auto-close-status" class="mb-10 text-sm text-indigo-400 font-bold hidden">
+            سيتم الإغلاق تلقائياً خلال: <span id="countdown-timer">00:00</span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-6 justify-center items-center w-full">
+            <button onclick="stopAlarm()" class="w-full sm:w-auto px-16 py-5 bg-white text-black rounded-full text-xl font-black hover:scale-105 active:scale-95 transition-all shadow-2xl">
+                إيقاف المنبه
+            </button>
+            <button onclick="snoozeAlarm()" id="snooze-btn" class="w-full sm:w-auto px-16 py-5 bg-indigo-600 text-white rounded-full text-xl font-black hover:scale-105 active:scale-95 transition-all shadow-2xl">
+                غفوة
+            </button>
+        </div>
+    </div>
+</div>
 
     <script>
-        let alarms = JSON.parse(localStorage.getItem('myAlarms')) || [];
-        let activeAlarm = null;
-        let alarmAudio = new Audio();
-        let autoOffTimer = null;
+        let alarms = [];
+        let editingId = null;
+        let selectedDays = [];
+        let customAudioData = null;
+        let audioPlayer = new Audio();
+        let autoCloseTimeout = null;
         let countdownInterval = null;
+        let currentActiveAlarm = null;
 
         window.onload = () => {
-            initTheme();
-            renderAlarms();
-            setInterval(updateClock, 1000);
-            
-            document.querySelectorAll('.day-btn').forEach(btn => {
-                btn.onclick = () => btn.classList.toggle('bg-blue-600');
-            });
+            const savedAlarms = localStorage.getItem('alarms_v3');
+            if (savedAlarms) {
+                alarms = JSON.parse(savedAlarms);
+                renderAlarms();
+            }
+            updateTime();
+            setInterval(updateTime, 1000);
         };
 
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            const themeToggle = document.getElementById('theme-toggle');
-            if (savedTheme === 'light') {
-                document.body.classList.replace('dark-mode', 'light-mode');
-                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-            }
-        }
-
-        document.getElementById('theme-toggle').onclick = function() {
-            const isDark = document.body.classList.contains('dark-mode');
-            if (isDark) {
-                document.body.classList.replace('dark-mode', 'light-mode');
-                this.innerHTML = '<i class="fas fa-moon"></i>';
-                localStorage.setItem('theme', 'light');
-            } else {
-                document.body.classList.replace('light-mode', 'dark-mode');
-                this.innerHTML = '<i class="fas fa-sun"></i>';
-                localStorage.setItem('theme', 'dark');
-            }
-        };
-
-        function format12h(timeStr) {
-            let [hours, minutes] = timeStr.split(':');
-            hours = parseInt(hours);
-            const ampm = hours >= 12 ? 'م' : 'ص';
-            hours = hours % 12;
-            hours = hours ? hours : 12;
-            return `${hours}:${minutes} ${ampm}`;
-        }
-
-        function updateClock() {
+        function updateTime() {
             const now = new Date();
-            const timeString = now.toLocaleTimeString('ar-EG', { 
-                hour12: true, 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit' 
-            });
-            const dateString = now.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
-
-            document.getElementById('current-time').textContent = timeString;
-            document.getElementById('current-date').textContent = dateString;
-
+            const timeStr = now.toLocaleTimeString('ar-EG', { hour12: false });
+            const dateStr = now.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            
+            document.getElementById('current-time').textContent = timeStr;
+            document.getElementById('current-date').textContent = dateStr;
+            
             checkAlarms(now);
+            calculateNextAlarm(now);
         }
 
-        function toggleModal(id) {
-            const modal = document.getElementById(id);
-            modal.classList.toggle('hidden');
-            if (id === 'alarm-modal' && modal.classList.contains('hidden')) {
-                resetModal();
+        function calculateNextAlarm(now) {
+            let nearestAlarm = null;
+            let minDiff = Infinity;
+
+            const enabledAlarms = alarms.filter(a => a.enabled);
+            if (enabledAlarms.length === 0) {
+                document.getElementById('next-alarm-countdown').textContent = "لا توجد منبهات مفعلة";
+                document.getElementById('next-alarm-time').textContent = "---";
+                return;
+            }
+
+            enabledAlarms.forEach(alarm => {
+                const [h, m] = alarm.time.split(':').map(Number);
+                const targetDays = alarm.days.length > 0 ? alarm.days : [0, 1, 2, 3, 4, 5, 6];
+                
+                targetDays.forEach(day => {
+                    let d = new Date(now);
+                    d.setHours(h, m, 0, 0);
+                    let dayDiff = (day - now.getDay() + 7) % 7;
+                    d.setDate(d.getDate() + dayDiff);
+
+                    if (d <= now) {
+                        d.setDate(d.getDate() + (alarm.days.length > 0 ? 7 : 1));
+                    }
+
+                    const diff = d - now;
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        nearestAlarm = d;
+                    }
+                });
+            });
+
+            if (nearestAlarm) {
+                const diffMs = nearestAlarm - now;
+                const hours = Math.floor(diffMs / 3600000);
+                const minutes = Math.floor((diffMs % 3600000) / 60000);
+                let countdownText = "";
+                if (hours > 0) countdownText += `${hours} ساعة و `;
+                countdownText += `${minutes} دقيقة`;
+                
+                document.getElementById('next-alarm-countdown').textContent = `الرنين بعد ${countdownText}`;
+                document.getElementById('next-alarm-time').textContent = `في يوم ${nearestAlarm.toLocaleDateString('ar-EG', {weekday: 'long'})} الساعة ${nearestAlarm.getHours().toString().padStart(2, '0')}:${nearestAlarm.getMinutes().toString().padStart(2, '0')}`;
             }
         }
 
-        function resetModal() {
-            document.getElementById('edit-id').value = '';
-            document.getElementById('alarm-label').value = '';
-            document.getElementById('alarm-time').value = '';
-            document.getElementById('alarm-sound').value = '';
-            document.querySelectorAll('.day-btn').forEach(btn => btn.classList.remove('bg-blue-600'));
-            document.getElementById('modal-title').textContent = 'إضافة منبه جديد';
-        }
-
-        function saveAlarm() {
-            const idInput = document.getElementById('edit-id').value;
-            const label = document.getElementById('alarm-label').value || 'منبه';
-            const time = document.getElementById('alarm-time').value;
-            const autoOff = parseInt(document.getElementById('auto-off').value);
-            const soundFile = document.getElementById('alarm-sound').files[0];
-            
-            const selectedDays = [];
-            document.querySelectorAll('.day-btn.bg-blue-600').forEach(btn => {
-                selectedDays.push(parseInt(btn.dataset.day));
-            });
-
-            if (!time) return;
-
-            const id = idInput ? parseInt(idInput) : Date.now();
-            
-            const newAlarm = {
-                id,
-                label,
-                time,
-                days: selectedDays,
-                autoOff,
-                active: true,
-                sound: soundFile ? URL.createObjectURL(soundFile) : (alarms.find(a => a.id == id)?.sound || null)
-            };
-
-            const index = alarms.findIndex(a => a.id == id);
-            if (index > -1) alarms[index] = newAlarm;
-            else alarms.push(newAlarm);
-
-            localStorage.setItem('myAlarms', JSON.stringify(alarms));
-            renderAlarms();
-            toggleModal('alarm-modal');
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    customAudioData = e.target.result;
+                    document.getElementById('file-name-display').textContent = file.name;
+                    document.getElementById('file-name-display').classList.remove('text-gray-400');
+                    document.getElementById('file-name-display').classList.add('text-indigo-300');
+                };
+                reader.readAsDataURL(file);
+            }
         }
 
         function renderAlarms() {
-            const list = document.getElementById('alarms-list');
-            const empty = document.getElementById('empty-state');
+            const list = document.getElementById('alarm-list');
             list.innerHTML = '';
+            let activeCount = 0;
             
-            if (alarms.length === 0) {
-                empty.classList.remove('hidden');
-                return;
-            }
-            empty.classList.add('hidden');
-
             alarms.sort((a, b) => a.time.localeCompare(b.time)).forEach(alarm => {
+                if (alarm.enabled) activeCount++;
                 const card = document.createElement('div');
-                card.className = `glass-card p-4 alarm-item flex justify-between items-center ${alarm.active ? '' : 'opacity-60'}`;
+                card.className = `glass-panel p-8 flex flex-col justify-between h-64 relative overflow-hidden ${alarm.enabled ? '' : 'opacity-40 grayscale'}`;
                 
-                const daysLabels = ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'];
-                let daysHtml = "مرة واحدة";
-                if(alarm.days.length === 7) daysHtml = "يومياً";
-                else if(alarm.days.length > 0) daysHtml = alarm.days.map(d => daysLabels[d]).join(' ');
+                const daysLabels = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
+                const daysHtml = alarm.days.length > 0 
+                    ? alarm.days.map(d => `<span class="text-[9px] bg-indigo-500/20 px-1 rounded text-indigo-300">${daysLabels[d]}</span>`).join(' ')
+                    : '<span class="text-[9px] bg-white/5 px-1 rounded text-gray-500">يومياً</span>';
 
                 card.innerHTML = `
-                    <div class="flex-1 cursor-pointer" onclick="editAlarm(${alarm.id})">
-                        <div class="flex items-center gap-2">
-                            <span class="text-2xl font-bold">${format12h(alarm.time)}</span>
-                            <span class="text-xs bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded">${alarm.label}</span>
+                    <div class="flex justify-between items-start z-10">
+                        <div>
+                            <div class="text-[10px] text-indigo-400 font-bold uppercase mb-1 truncate max-w-[150px]">${alarm.label || 'منبه'}</div>
+                            <div class="text-5xl font-black tracking-tighter cursor-pointer hover:text-indigo-400 transition-colors" onclick="editAlarm('${alarm.id}')">${alarm.time}</div>
+                            <div class="flex gap-1 mt-3">${daysHtml}</div>
                         </div>
-                        <div class="text-xs text-gray-500 mt-1">${daysHtml}</div>
-                    </div>
-                    <div class="flex items-center gap-4">
                         <label class="switch">
-                            <input type="checkbox" onchange="toggleAlarmActive(${alarm.id})" ${alarm.active ? 'checked' : ''}>
+                            <input type="checkbox" ${alarm.enabled ? 'checked' : ''} onchange="toggleAlarm('${alarm.id}')">
                             <span class="slider"></span>
                         </label>
-                        <button onclick="deleteAlarm(${alarm.id})" class="text-red-500 p-2 hover:bg-red-500/10 rounded-full transition"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div class="flex justify-between items-center mt-6 z-10 border-t border-white/5 pt-4">
+                        <div class="text-[10px] text-gray-500 uppercase flex flex-col gap-1">
+                            <span class="flex items-center gap-2">
+                                <i class="fas ${alarm.audioName ? 'fa-music text-pink-400' : 'fa-bell'}"></i>
+                                <span class="truncate max-w-[120px]">${alarm.audioName || 'افتراضية'}</span>
+                            </span>
+                            <span>غفوة: ${alarm.snoozeMin || 5} د</span>
+                        </div>
+                        <button onclick="deleteAlarm('${alarm.id}')" class="text-gray-600 hover:text-red-400 transition-colors p-2"><i class="fas fa-trash-alt text-lg"></i></button>
                     </div>
                 `;
                 list.appendChild(card);
             });
+            document.getElementById('active-count').textContent = activeCount;
+            calculateNextAlarm(new Date());
         }
 
-        function editAlarm(id) {
-            const alarm = alarms.find(a => a.id == id);
-            if (!alarm) return;
-
-            document.getElementById('edit-id').value = alarm.id;
-            document.getElementById('alarm-label').value = alarm.label;
-            document.getElementById('alarm-time').value = alarm.time;
-            document.getElementById('auto-off').value = alarm.autoOff;
-            
-            document.querySelectorAll('.day-btn').forEach(btn => {
-                if (alarm.days.includes(parseInt(btn.dataset.day))) btn.classList.add('bg-blue-600');
-                else btn.classList.remove('bg-blue-600');
-            });
-
-            document.getElementById('modal-title').textContent = 'تعديل المنبه';
-            toggleModal('alarm-modal');
+        function openModal() {
+            editingId = null;
+            selectedDays = [];
+            customAudioData = null;
+            document.getElementById('modal-title').textContent = 'منبه جديد';
+            document.getElementById('alarm-name').value = "";
+            document.getElementById('alarm-time').value = "08:00";
+            document.getElementById('snooze-min').value = "5";
+            document.getElementById('auto-close-toggle').checked = false;
+            document.getElementById('file-name-display').textContent = "استخدام نغمة من الجهاز...";
+            document.querySelectorAll('.day-btn').forEach(btn => btn.classList.remove('active'));
+            toggleAutoCloseInputs();
+            document.getElementById('alarm-modal').classList.remove('hidden');
         }
 
-        function deleteAlarm(id) {
-            alarms = alarms.filter(a => a.id != id);
-            localStorage.setItem('myAlarms', JSON.stringify(alarms));
+        function closeModal() {
+            document.getElementById('alarm-modal').classList.add('hidden');
+        }
+
+        function toggleDay(btn, day) {
+            btn.classList.toggle('active');
+            if (selectedDays.includes(day)) selectedDays = selectedDays.filter(d => d !== day);
+            else selectedDays.push(day);
+        }
+
+        function toggleAutoCloseInputs() {
+            const active = document.getElementById('auto-close-toggle').checked;
+            const container = document.getElementById('auto-close-inputs');
+            container.style.opacity = active ? "1" : "0.5";
+            container.style.pointerEvents = active ? "all" : "none";
+        }
+
+        function saveAlarm() {
+            const label = document.getElementById('alarm-name').value;
+            const time = document.getElementById('alarm-time').value;
+            const snoozeMin = parseInt(document.getElementById('snooze-min').value) || 5;
+            const autoCloseEnabled = document.getElementById('auto-close-toggle').checked;
+            const min = parseInt(document.getElementById('close-min').value) || 0;
+            const sec = parseInt(document.getElementById('close-sec').value) || 0;
+            const audioName = document.getElementById('file-name-display').textContent;
+
+            const newAlarm = {
+                id: editingId || Date.now().toString(),
+                label: label || "منبه",
+                time: time,
+                days: [...selectedDays],
+                enabled: true,
+                audioData: customAudioData,
+                audioName: customAudioData ? audioName : null,
+                autoCloseSeconds: autoCloseEnabled ? (min * 60) + sec : null,
+                snoozeMin: snoozeMin
+            };
+
+            if (editingId) {
+                const old = alarms.find(a => a.id === editingId);
+                if (!newAlarm.audioData) {
+                    newAlarm.audioData = old.audioData;
+                    newAlarm.audioName = old.audioName;
+                }
+                alarms = alarms.map(a => a.id === editingId ? newAlarm : a);
+            } else {
+                alarms.push(newAlarm);
+            }
+
+            localStorage.setItem('alarms_v3', JSON.stringify(alarms));
+            renderAlarms();
+            closeModal();
+        }
+
+        function toggleAlarm(id) {
+            alarms = alarms.map(a => a.id === id ? {...a, enabled: !a.enabled} : a);
+            localStorage.setItem('alarms_v3', JSON.stringify(alarms));
             renderAlarms();
         }
 
-        function toggleAlarmActive(id) {
-            const alarm = alarms.find(a => a.id == id);
-            if (alarm) {
-                alarm.active = !alarm.active;
-                localStorage.setItem('myAlarms', JSON.stringify(alarms));
-                renderAlarms();
+        function deleteAlarm(id) {
+            alarms = alarms.filter(a => a.id !== id);
+            localStorage.setItem('alarms_v3', JSON.stringify(alarms));
+            renderAlarms();
+        }
+
+        function editAlarm(id) {
+            const alarm = alarms.find(a => a.id === id);
+            if (!alarm) return;
+            editingId = id;
+            document.getElementById('modal-title').textContent = 'تعديل المنبه';
+            document.getElementById('alarm-name').value = alarm.label || "";
+            document.getElementById('alarm-time').value = alarm.time;
+            document.getElementById('snooze-min').value = alarm.snoozeMin || 5;
+            document.getElementById('auto-close-toggle').checked = alarm.autoCloseSeconds !== null;
+            
+            if (alarm.audioName) {
+                document.getElementById('file-name-display').textContent = alarm.audioName;
+                document.getElementById('file-name-display').classList.add('text-indigo-300');
+            } else {
+                document.getElementById('file-name-display').textContent = "استخدام نغمة من الجهاز...";
+                document.getElementById('file-name-display').classList.remove('text-indigo-300');
             }
+
+            if (alarm.autoCloseSeconds) {
+                document.getElementById('close-min').value = Math.floor(alarm.autoCloseSeconds / 60);
+                document.getElementById('close-sec').value = alarm.autoCloseSeconds % 60;
+            }
+            selectedDays = [...alarm.days];
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                if (selectedDays.includes(parseInt(btn.dataset.day))) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            toggleAutoCloseInputs();
+            document.getElementById('alarm-modal').classList.remove('hidden');
         }
 
         function checkAlarms(now) {
-            const currentH = String(now.getHours()).padStart(2, '0');
-            const currentM = String(now.getMinutes()).padStart(2, '0');
-            const currentTime = `${currentH}:${currentM}`;
+            const currentHM = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
             const currentDay = now.getDay();
+            if (now.getSeconds() !== 0) return;
 
             alarms.forEach(alarm => {
-                if (alarm.active && alarm.time === currentTime && now.getSeconds() === 0) {
+                if (alarm.enabled && alarm.time === currentHM) {
                     if (alarm.days.length === 0 || alarm.days.includes(currentDay)) {
                         triggerAlarm(alarm);
                     }
@@ -512,81 +562,74 @@
         }
 
         function triggerAlarm(alarm) {
-            if (activeAlarm) return;
-            activeAlarm = alarm;
-
-            document.getElementById('ringing-label').textContent = alarm.label;
-            document.getElementById('ringing-time').textContent = format12h(alarm.time);
-            document.getElementById('ringing-ui').classList.remove('hidden');
-
-            alarmAudio.src = alarm.sound || 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3';
-            alarmAudio.loop = true;
-            alarmAudio.play().catch(() => {});
-
-            if (alarm.autoOff > 0) {
-                document.getElementById('auto-off-container').classList.remove('hidden');
-                startCountdown(alarm.autoOff);
-                autoOffTimer = setTimeout(stopAlarm, alarm.autoOff * 1000);
+            stopAlarm();
+            currentActiveAlarm = alarm;
+            document.getElementById('ringing-label').textContent = alarm.label || "المنبه";
+            document.getElementById('ringing-time-display').textContent = alarm.time;
+            document.getElementById('ringing-screen').classList.remove('hidden');
+            
+            if (alarm.audioData) {
+                audioPlayer.src = alarm.audioData;
             } else {
-                document.getElementById('auto-off-container').classList.add('hidden');
+                audioPlayer.src = "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg";
             }
-        }
+            
+            audioPlayer.loop = true;
+            audioPlayer.volume = 1;
+            audioPlayer.play().catch(e => console.log("Audio failed"));
 
-        function startCountdown(seconds) {
-            const total = seconds;
-            let current = seconds;
-            const display = document.getElementById('time-remaining');
-            const bar = document.getElementById('progress-bar');
-            
-            bar.style.width = '100%';
-            
-            clearInterval(countdownInterval);
-            countdownInterval = setInterval(() => {
-                current--;
-                const mins = Math.floor(current / 60);
-                const secs = current % 60;
-                display.textContent = `${mins > 0 ? mins + ':' : ''}${String(secs).padStart(2, '0')} ثانية`;
+            if (alarm.autoCloseSeconds && alarm.autoCloseSeconds > 0) {
+                const statusDiv = document.getElementById('auto-close-status');
+                const countdownSpan = document.getElementById('countdown-timer');
+                statusDiv.classList.remove('hidden');
                 
-                const percentage = (current / total) * 100;
-                bar.style.width = percentage + '%';
-
-                if (current <= 0) clearInterval(countdownInterval);
-            }, 1000);
-        }
-
-        function stopAlarm() {
-            alarmAudio.pause();
-            alarmAudio.currentTime = 0;
-            document.getElementById('ringing-ui').classList.add('hidden');
-            clearTimeout(autoOffTimer);
-            clearInterval(countdownInterval);
-            
-            if (activeAlarm && activeAlarm.days.length === 0) {
-                const alarmToDeactivate = alarms.find(a => a.id == activeAlarm.id);
-                if (alarmToDeactivate) alarmToDeactivate.active = false;
-                localStorage.setItem('myAlarms', JSON.stringify(alarms));
-                renderAlarms();
+                let remaining = alarm.autoCloseSeconds;
+                const updateUI = () => {
+                    const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+                    const s = (remaining % 60).toString().padStart(2, '0');
+                    countdownSpan.textContent = `${m}:${s}`;
+                };
+                
+                updateUI();
+                countdownInterval = setInterval(() => {
+                    remaining--;
+                    updateUI();
+                    if (remaining <= 0) stopAlarm();
+                }, 1000);
+            } else {
+                document.getElementById('auto-close-status').classList.add('hidden');
             }
-            activeAlarm = null;
         }
 
         function snoozeAlarm() {
-            stopAlarm();
-            const now = new Date();
-            now.setMinutes(now.getMinutes() + 5);
-            const snoozeTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            if (!currentActiveAlarm) return;
             
-            alarms.push({
-                id: Date.now(),
-                label: "غفوة",
+            const snoozeMinutes = currentActiveAlarm.snoozeMin || 5;
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + snoozeMinutes);
+            const snoozeTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            
+            const snoozeAlarmObj = {
+                ...currentActiveAlarm,
+                id: 'snooze-' + Date.now(),
+                label: `غفوة: ${currentActiveAlarm.label}`,
                 time: snoozeTime,
-                days: [],
-                autoOff: 60,
-                active: true,
-                sound: null
-            });
-            localStorage.setItem('myAlarms', JSON.stringify(alarms));
+                days: [], 
+                enabled: true
+            };
+            
+            alarms.push(snoozeAlarmObj);
+            stopAlarm();
             renderAlarms();
+        }
+
+        function stopAlarm() {
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+            if (autoCloseTimeout) clearTimeout(autoCloseTimeout);
+            if (countdownInterval) clearInterval(countdownInterval);
+            document.getElementById('ringing-screen').classList.add('hidden');
+            currentActiveAlarm = null;
         }
     </script>
 </body>
